@@ -1,0 +1,8 @@
+{
+  "reference_host": "https://example-reference.com",
+  "testing_host": "https://example-testing.com",
+  "testing_file_path": "/path/to/your/test/file.txt",
+  "test_retries": 3,
+  "log_differences": false,
+  "difference_filter_regexes": ["json atom at path \\\\\".*?\\\\.cdn_uri\\\\\" is missing from rhs\\\\n*"]
+}
