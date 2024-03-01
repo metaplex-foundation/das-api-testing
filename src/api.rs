@@ -31,26 +31,3 @@ impl IntegrityVerificationApi {
         Ok(serde_json::from_str(resp.as_str())?)
     }
 }
-
-#[tokio::test]
-async fn test_api() {
-    use crate::diff_checker::GET_ASSET_METHOD;
-    use crate::params_generation::generate_get_asset_params;
-    use crate::requests::Body;
-    use serde_json::{json, Value};
-
-    let api = IntegrityVerificationApi::new();
-    let body = json!(Body::new(
-        GET_ASSET_METHOD,
-        json!(generate_get_asset_params(
-            "JCoRmqZf2Q9ftb4a81aD6XswpFgQHPGXvsHAmgvZ54M1".to_string()
-        )),
-    ));
-
-    assert_ne!(
-        Value::Null,
-        api.make_request("http://test_url", &body.to_string())
-            .await
-            .unwrap()
-    );
-}

@@ -1,7 +1,7 @@
 use tokio::signal;
 use tokio::task::{JoinError, JoinSet};
 use tokio_util::sync::CancellationToken;
-use tracing::{error, info};
+use tracing::error;
 
 pub async fn listen_shutdown(cancel_token: CancellationToken) {
     tokio::spawn(async move {
