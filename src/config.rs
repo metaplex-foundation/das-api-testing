@@ -9,6 +9,7 @@ const fn default_test_retries() -> u64 {
 pub struct IntegrityVerificationConfig {
     pub reference_host: String,
     pub testing_host: String,
+    pub rpc_endpoint: String,
     pub testing_file_path: String,
     #[serde(default = "default_test_retries")]
     pub test_retries: u64,

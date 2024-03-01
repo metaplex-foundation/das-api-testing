@@ -19,9 +19,7 @@ pub async fn listen_shutdown(cancel_token: CancellationToken) {
 pub async fn graceful_stop(tasks: &mut JoinSet<Result<(), JoinError>>) {
     while let Some(task) = tasks.join_next().await {
         match task {
-            Ok(_) => {
-                info!("One of the tasks was finished")
-            }
+            Ok(_) => {}
             Err(err) if err.is_panic() => {
                 let err = err.into_panic();
                 error!("Task panic: {:?}", err);
