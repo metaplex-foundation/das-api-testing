@@ -4,12 +4,15 @@ use crate::diff_checker::{
 };
 use crate::interfaces::IntegrityVerificationKeysFetcher;
 use async_trait::async_trait;
+use rand::rngs::{StdRng, ThreadRng};
+use rand::{thread_rng, Rng, SeedableRng};
 use std::collections::HashMap;
 use tokio::fs::File;
 use tokio::io::{AsyncBufReadExt, BufReader};
 
 pub struct FileKeysFetcher {
     keys_map: HashMap<String, Vec<String>>,
+    rnd: StdRng,
 }
 
 impl FileKeysFetcher {
@@ -39,10 +42,26 @@ impl FileKeysFetcher {
             }
         }
 
-        Ok(FileKeysFetcher { keys_map })
+        let rnd = StdRng::from_entropy();
+
+        Ok(FileKeysFetcher { keys_map, rnd })
     }
     fn read_keys(&self, method_name: &str) -> Result<Vec<String>, String> {
         Ok(self.keys_map.get(method_name).cloned().unwrap_or_default())
+    }
+
+    pub fn get_random_command(&mut self) -> (String, String) {
+        let commands: Vec<&String> = self.keys_map.keys().collect();
+
+        let command_ind = self.rnd.gen_range(0..commands.len());
+
+        let command_args_len = self.keys_map.get(commands[command_ind]).unwrap().len();
+
+        let arg_ind = self.rnd.gen_range(0..command_args_len);
+
+        let arg = self.keys_map.get(commands[command_ind]).unwrap()[arg_ind].clone();
+
+        (commands[command_ind].clone(), arg)
     }
 }
 #[async_trait]

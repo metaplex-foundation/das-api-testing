@@ -17,6 +17,17 @@ pub struct IntegrityVerificationConfig {
     pub log_differences: bool,
     #[serde(default)]
     pub difference_filter_regexes: Vec<String>,
+    pub num_of_virtual_users: usize,
+    pub test_duration_time: u64,  // seconds
+    pub load_profile: LoadProfile,
+}
+
+#[derive(Deserialize, Debug)]
+pub enum LoadProfile {
+    Fixed,
+    RumpUp,
+    Spike,
+    Peak,
 }
 
 pub fn setup_config(path: &str) -> Result<IntegrityVerificationConfig, IntegrityVerificationError> {

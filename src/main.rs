@@ -8,6 +8,8 @@ use crate::file_keys_fetcher::FileKeysFetcher;
 use crate::graceful_stop::{graceful_stop, listen_shutdown};
 use crate::interfaces::IntegrityVerificationKeysFetcher;
 use clap::Parser;
+use config::LoadProfile;
+use performance_measurement::run_performance_tests;
 use std::sync::Arc;
 use tokio::task::{JoinError, JoinSet};
 use tokio_util::sync::CancellationToken;
@@ -24,6 +26,7 @@ mod interfaces;
 mod merkle_tree;
 mod params_generation;
 mod requests;
+mod performance_measurement;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -33,27 +36,29 @@ struct Args {
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> Result<(), IntegrityVerificationError> {
-    let args = Args::parse();
-    env_logger::init();
-    info!("DAS-API tests start");
+    // let args = Args::parse();
+    // env_logger::init();
+    // info!("DAS-API tests start");
 
-    let config = setup_config(args.config_path.as_str())?;
-    let mut tasks = JoinSet::new();
-    let cancel_token = CancellationToken::new();
+    // let config = setup_config(args.config_path.as_str())?;
+    // let mut tasks = JoinSet::new();
+    // let cancel_token = CancellationToken::new();
 
-    let diff_checker = Arc::new(
-        DiffChecker::new(
-            &config,
-            FileKeysFetcher::new(&config.testing_file_path.clone())
-                .await
-                .unwrap(),
-        )
-        .await?,
-    );
+    // let diff_checker = Arc::new(
+    //     DiffChecker::new(
+    //         &config,
+    //         FileKeysFetcher::new(&config.testing_file_path.clone())
+    //             .await
+    //             .unwrap(),
+    //     )
+    //     .await?,
+    // );
 
-    listen_shutdown(cancel_token.clone()).await;
-    run_tests(&mut tasks, diff_checker.clone(), cancel_token.clone()).await;
-    diff_checker.show_results().await;
+    // listen_shutdown(cancel_token.clone()).await;
+    // run_tests(&mut tasks, diff_checker.clone(), cancel_token.clone()).await;
+    // diff_checker.show_results().await;
+
+    run_performance_tests(10, 1, LoadProfile::Fixed).await;
 
     Ok(())
 }
