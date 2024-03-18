@@ -4,12 +4,13 @@ use crate::diff_checker::{
 };
 use crate::interfaces::IntegrityVerificationKeysFetcher;
 use async_trait::async_trait;
-use rand::rngs::{StdRng, ThreadRng};
-use rand::{thread_rng, Rng, SeedableRng};
+use rand::rngs::StdRng;
+use rand::{Rng, SeedableRng};
 use std::collections::HashMap;
 use tokio::fs::File;
 use tokio::io::{AsyncBufReadExt, BufReader};
 
+#[derive(Clone)]
 pub struct FileKeysFetcher {
     keys_map: HashMap<String, Vec<String>>,
     rnd: StdRng,

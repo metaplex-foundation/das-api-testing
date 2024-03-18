@@ -28,4 +28,6 @@ pub enum IntegrityVerificationError {
     InvalidRegex(String),
     #[error("ValidateConfig: {0}")]
     ValidateConfig(String),
+    #[error("ResponseStatusCode: {0}")]
+    ResponseStatusCode(u16),
 }
