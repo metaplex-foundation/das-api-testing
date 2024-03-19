@@ -6,6 +6,7 @@ use crate::params_generation::{
     generate_get_asset_params, generate_get_asset_proof_params,
     generate_get_assets_by_authority_params, generate_get_assets_by_creator_params,
     generate_get_assets_by_group_params, generate_get_assets_by_owner_params,
+    generate_get_signatures_for_asset, generate_get_token_accounts,
 };
 use crate::requests::Body;
 use crate::{_check_proof, check_proof};
@@ -34,6 +35,11 @@ pub const GET_ASSET_BY_OWNER_METHOD: &str = "getAssetsByOwner";
 pub const GET_ASSET_BY_AUTHORITY_METHOD: &str = "getAssetsByAuthority";
 pub const GET_ASSET_BY_GROUP_METHOD: &str = "getAssetsByGroup";
 pub const GET_ASSET_BY_CREATOR_METHOD: &str = "getAssetsByCreator";
+pub const GET_TOKEN_ACCOUNTS: &str = "getTokenAccounts";
+pub const GET_TOKEN_ACCOUNTS_BY_OWNER: &str = "getTokenAccountsByOwner";
+pub const GET_TOKEN_ACCOUNTS_BY_MINT: &str = "getTokenAccountsByMint";
+pub const GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT: &str = "getTokenAccountsByOwnerAndMint";
+pub const GET_SIGNATURES_FOR_ASSET: &str = "getSignaturesForAsset";
 
 const REQUESTS_INTERVAL_MILLIS: u64 = 1500;
 
@@ -365,12 +371,7 @@ where
 
         Ok(())
     }
-}
 
-impl<T> DiffChecker<T>
-where
-    T: IntegrityVerificationKeysFetcher + Send + Sync,
-{
     async fn check_proof_valid(
         &self,
         asset_id: &str,
@@ -437,6 +438,98 @@ where
         )?;
 
         check_proof!(&header, &tree_bytes, initial_proofs, leaf, leaf_index)
+    }
+
+    pub async fn check_get_token_accounts_by_owner(
+        &self,
+    ) -> Result<(), IntegrityVerificationError> {
+        let verification_required_keys = self
+            .keys_fetcher
+            .get_verification_required_tokens_by_owner()
+            .await
+            .map_err(IntegrityVerificationError::FetchKeys)?;
+
+        let requests = verification_required_keys
+            .into_iter()
+            .map(|owner| {
+                Body::new(
+                    GET_TOKEN_ACCOUNTS,
+                    json!(generate_get_token_accounts(Some(owner), None)),
+                )
+            })
+            .collect::<Vec<_>>();
+
+        self.check_requests(requests).await;
+
+        Ok(())
+    }
+
+    pub async fn check_get_token_accounts_by_mint(&self) -> Result<(), IntegrityVerificationError> {
+        let verification_required_keys = self
+            .keys_fetcher
+            .get_verification_required_tokens_by_mint()
+            .await
+            .map_err(IntegrityVerificationError::FetchKeys)?;
+
+        let requests = verification_required_keys
+            .into_iter()
+            .map(|mint| {
+                Body::new(
+                    GET_TOKEN_ACCOUNTS,
+                    json!(generate_get_token_accounts(None, Some(mint))),
+                )
+            })
+            .collect::<Vec<_>>();
+
+        self.check_requests(requests).await;
+
+        Ok(())
+    }
+
+    pub async fn check_get_token_accounts_by_owner_and_mint(
+        &self,
+    ) -> Result<(), IntegrityVerificationError> {
+        let verification_required_keys = self
+            .keys_fetcher
+            .get_verification_required_tokens_by_owner_and_mint()
+            .await
+            .map_err(IntegrityVerificationError::FetchKeys)?;
+
+        let requests = verification_required_keys
+            .into_iter()
+            .map(|pair| {
+                Body::new(
+                    GET_TOKEN_ACCOUNTS,
+                    json!(generate_get_token_accounts(Some(pair.0), Some(pair.1))),
+                )
+            })
+            .collect::<Vec<_>>();
+
+        self.check_requests(requests).await;
+
+        Ok(())
+    }
+
+    pub async fn check_get_signatures_for_asset(&self) -> Result<(), IntegrityVerificationError> {
+        let verification_required_keys = self
+            .keys_fetcher
+            .get_verification_required_signatures_for_asset()
+            .await
+            .map_err(IntegrityVerificationError::FetchKeys)?;
+
+        let requests = verification_required_keys
+            .into_iter()
+            .map(|asset| {
+                Body::new(
+                    GET_SIGNATURES_FOR_ASSET,
+                    json!(generate_get_signatures_for_asset(asset)),
+                )
+            })
+            .collect::<Vec<_>>();
+
+        self.check_requests(requests).await;
+
+        Ok(())
     }
 }
 

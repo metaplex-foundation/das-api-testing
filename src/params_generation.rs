@@ -1,6 +1,6 @@
 use crate::api_req_params::{
-    AssetSortBy, AssetSortDirection, AssetSorting, GetAsset, GetAssetProof, GetAssetsByAuthority,
-    GetAssetsByCreator, GetAssetsByGroup, GetAssetsByOwner,
+    AssetSortBy, AssetSortDirection, AssetSorting, GetAsset, GetAssetProof, GetAssetSignatures,
+    GetAssetsByAuthority, GetAssetsByCreator, GetAssetsByGroup, GetAssetsByOwner, GetTokenAccounts,
 };
 use rand::Rng;
 
@@ -21,16 +21,22 @@ fn get_random_asset_sorting_arg() -> Option<AssetSorting> {
             2 => AssetSortBy::RecentAction,
             _ => AssetSortBy::None,
         },
-        sort_direction: if rng.gen() {
-            Some(if rng.gen() {
-                AssetSortDirection::Asc
-            } else {
-                AssetSortDirection::Desc
-            })
-        } else {
-            None
-        },
+        sort_direction: get_random_sort_direction(),
     })
+}
+
+fn get_random_sort_direction() -> Option<AssetSortDirection> {
+    let mut rng = rand::thread_rng();
+
+    if rng.gen() {
+        Some(if rng.gen() {
+            AssetSortDirection::Asc
+        } else {
+            AssetSortDirection::Desc
+        })
+    } else {
+        None
+    }
 }
 
 fn get_random_limit_arg() -> Option<u32> {
@@ -136,4 +142,31 @@ pub fn generate_get_asset_params(id: String) -> GetAsset {
 
 pub fn generate_get_asset_proof_params(id: String) -> GetAssetProof {
     GetAssetProof { id }
+}
+
+pub fn generate_get_token_accounts(
+    owner: Option<String>,
+    mint: Option<String>,
+) -> GetTokenAccounts {
+    GetTokenAccounts {
+        limit: get_random_limit_arg(),
+        page: Some(get_random_page_arg()),
+        owner,
+        mint,
+        options: None,
+    }
+}
+
+pub fn generate_get_signatures_for_asset(asset: String) -> GetAssetSignatures {
+    GetAssetSignatures {
+        id: Some(asset),
+        limit: get_random_limit_arg(),
+        page: Some(get_random_page_arg()),
+        before: None,
+        after: None,
+        tree: None,
+        leaf_index: None,
+        sort_direction: get_random_sort_direction(),
+        cursor: None,
+    }
 }

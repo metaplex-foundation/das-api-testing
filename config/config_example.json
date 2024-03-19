@@ -2,8 +2,10 @@
   "reference_host": "https://example-reference.com",
   "testing_host": "https://example-testing.com",
   "rpc_endpoint": "https://api.mainnet-beta.solana.com",
-  "testing_file_path": "/path/to/your/test/file.txt",
+  "testing_file_path": "./testing_keys/testing_keys_example.txt",
   "test_retries": 3,
   "log_differences": true,
-  "difference_filter_regexes": [""]
+  "difference_filter_regexes": [""],
+  "num_of_virtual_users": 5,
+  "test_duration_time": 10
 }
