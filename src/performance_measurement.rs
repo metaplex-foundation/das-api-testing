@@ -95,7 +95,17 @@ impl fmt::Display for Stats {
 
         let average_response_time = sum / self.response_time_millis.len() as u64;
 
-        write!(f, "\nNumber of requests sent: {}\nSuccessful: {}\nFailed: {}\n---\nAverage response time: {} ms\nMax response time: {}\nMin response time: {}\n", requests_in_general, self.successful_requests, self.failed_requests, average_response_time, max_response_time, min_response_time)?;
+        write!(
+            f,
+            "\nNumber of requests sent: {}\nSuccessful: {}\nFailed: {}\n",
+            requests_in_general, self.successful_requests, self.failed_requests
+        )?;
+
+        write!(
+            f,
+            "\n---\nAverage response time: {} ms\nMax response time: {}\nMin response time: {}\n",
+            average_response_time, max_response_time, min_response_time
+        )?;
 
         write!(f, "---\nError codes:\ncode - number")?;
         for (code, number) in self.error_codes.iter() {
