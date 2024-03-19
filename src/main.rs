@@ -2,6 +2,8 @@ use crate::config::setup_config;
 use crate::diff_checker::{
     DiffChecker, GET_ASSET_BY_AUTHORITY_METHOD, GET_ASSET_BY_CREATOR_METHOD,
     GET_ASSET_BY_GROUP_METHOD, GET_ASSET_BY_OWNER_METHOD, GET_ASSET_METHOD, GET_ASSET_PROOF_METHOD,
+    GET_SIGNATURES_FOR_ASSET, GET_TOKEN_ACCOUNTS_BY_MINT, GET_TOKEN_ACCOUNTS_BY_OWNER,
+    GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT,
 };
 use crate::error::IntegrityVerificationError;
 use crate::file_keys_fetcher::FileKeysFetcher;
@@ -151,6 +153,34 @@ async fn run_tests<T>(
         diff_checker,
         check_get_asset_by_group,
         GET_ASSET_BY_GROUP_METHOD,
+        cancel_token
+    );
+    spawn_test!(
+        tasks,
+        diff_checker,
+        check_get_token_accounts_by_owner,
+        GET_TOKEN_ACCOUNTS_BY_OWNER,
+        cancel_token
+    );
+    spawn_test!(
+        tasks,
+        diff_checker,
+        check_get_token_accounts_by_mint,
+        GET_TOKEN_ACCOUNTS_BY_MINT,
+        cancel_token
+    );
+    spawn_test!(
+        tasks,
+        diff_checker,
+        check_get_token_accounts_by_owner_and_mint,
+        GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT,
+        cancel_token
+    );
+    spawn_test!(
+        tasks,
+        diff_checker,
+        check_get_signatures_for_asset,
+        GET_SIGNATURES_FOR_ASSET,
         cancel_token
     );
     graceful_stop(tasks).await;

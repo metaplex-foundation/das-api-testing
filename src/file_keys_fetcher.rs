@@ -1,6 +1,7 @@
 use crate::diff_checker::{
     GET_ASSET_BY_AUTHORITY_METHOD, GET_ASSET_BY_CREATOR_METHOD, GET_ASSET_BY_GROUP_METHOD,
-    GET_ASSET_BY_OWNER_METHOD, GET_ASSET_METHOD, GET_ASSET_PROOF_METHOD,
+    GET_ASSET_BY_OWNER_METHOD, GET_ASSET_METHOD, GET_ASSET_PROOF_METHOD, GET_SIGNATURES_FOR_ASSET,
+    GET_TOKEN_ACCOUNTS_BY_MINT, GET_TOKEN_ACCOUNTS_BY_OWNER, GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT,
 };
 use crate::interfaces::IntegrityVerificationKeysFetcher;
 use async_trait::async_trait;
@@ -12,7 +13,7 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 
 #[derive(Clone)]
 pub struct FileKeysFetcher {
-    keys_map: HashMap<String, Vec<String>>,
+    pub keys_map: HashMap<String, Vec<String>>,
     rnd: StdRng,
 }
 
@@ -89,5 +90,37 @@ impl IntegrityVerificationKeysFetcher for FileKeysFetcher {
 
     async fn get_verification_required_assets_proof_keys(&self) -> Result<Vec<String>, String> {
         self.read_keys(GET_ASSET_PROOF_METHOD)
+    }
+
+    async fn get_verification_required_tokens_by_owner(&self) -> Result<Vec<String>, String> {
+        self.read_keys(GET_TOKEN_ACCOUNTS_BY_OWNER)
+    }
+
+    async fn get_verification_required_tokens_by_mint(&self) -> Result<Vec<String>, String> {
+        self.read_keys(GET_TOKEN_ACCOUNTS_BY_MINT)
+    }
+
+    async fn get_verification_required_tokens_by_owner_and_mint(
+        &self,
+    ) -> Result<Vec<(String, String)>, String> {
+        let sets = self.read_keys(GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT)?;
+
+        let mut pairs = Vec::new();
+
+        for pair in sets.iter() {
+            let owner_mint: Vec<String> = pair
+                .trim_matches(|c| c == '(' || c == ')')
+                .split(';')
+                .map(String::from)
+                .collect();
+
+            pairs.push((owner_mint[0].clone(), owner_mint[1].clone()));
+        }
+
+        Ok(pairs)
+    }
+
+    async fn get_verification_required_signatures_for_asset(&self) -> Result<Vec<String>, String> {
+        self.read_keys(GET_SIGNATURES_FOR_ASSET)
     }
 }
