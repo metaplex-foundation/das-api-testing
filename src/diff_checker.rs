@@ -35,6 +35,7 @@ pub const GET_ASSET_BY_OWNER_METHOD: &str = "getAssetsByOwner";
 pub const GET_ASSET_BY_AUTHORITY_METHOD: &str = "getAssetsByAuthority";
 pub const GET_ASSET_BY_GROUP_METHOD: &str = "getAssetsByGroup";
 pub const GET_ASSET_BY_CREATOR_METHOD: &str = "getAssetsByCreator";
+pub const GET_TOKEN_ACCOUNTS: &str = "getTokenAccounts";
 pub const GET_TOKEN_ACCOUNTS_BY_OWNER: &str = "getTokenAccountsByOwner";
 pub const GET_TOKEN_ACCOUNTS_BY_MINT: &str = "getTokenAccountsByMint";
 pub const GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT: &str = "getTokenAccountsByOwnerAndMint";
@@ -452,7 +453,7 @@ where
             .into_iter()
             .map(|owner| {
                 Body::new(
-                    GET_TOKEN_ACCOUNTS_BY_OWNER,
+                    GET_TOKEN_ACCOUNTS,
                     json!(generate_get_token_accounts(Some(owner), None)),
                 )
             })
@@ -474,7 +475,7 @@ where
             .into_iter()
             .map(|mint| {
                 Body::new(
-                    GET_TOKEN_ACCOUNTS_BY_MINT,
+                    GET_TOKEN_ACCOUNTS,
                     json!(generate_get_token_accounts(None, Some(mint))),
                 )
             })
@@ -498,7 +499,7 @@ where
             .into_iter()
             .map(|pair| {
                 Body::new(
-                    GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT,
+                    GET_TOKEN_ACCOUNTS,
                     json!(generate_get_token_accounts(Some(pair.0), Some(pair.1))),
                 )
             })

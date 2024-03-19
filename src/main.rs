@@ -34,7 +34,7 @@ struct Args {
     #[arg(short, long, default_value_t = String::new())]
     config_path: String,
     #[arg(short, long)]
-    test_to_run: TestsType,
+    test_type: TestsType,
 }
 
 #[derive(clap::ValueEnum, Clone, Debug)]
@@ -55,7 +55,7 @@ async fn main() -> Result<(), IntegrityVerificationError> {
         .await
         .unwrap();
 
-    match args.test_to_run {
+    match args.test_type {
         TestsType::Integrity => {
             let mut tasks = JoinSet::new();
             let cancel_token = CancellationToken::new();

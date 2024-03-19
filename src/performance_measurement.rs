@@ -5,6 +5,8 @@ use crate::{
     diff_checker::{
         GET_ASSET_BY_AUTHORITY_METHOD, GET_ASSET_BY_CREATOR_METHOD, GET_ASSET_BY_GROUP_METHOD,
         GET_ASSET_BY_OWNER_METHOD, GET_ASSET_METHOD, GET_ASSET_PROOF_METHOD,
+        GET_SIGNATURES_FOR_ASSET, GET_TOKEN_ACCOUNTS, GET_TOKEN_ACCOUNTS_BY_MINT,
+        GET_TOKEN_ACCOUNTS_BY_OWNER, GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT,
     },
     error::IntegrityVerificationError,
     file_keys_fetcher::FileKeysFetcher,
@@ -13,6 +15,7 @@ use crate::{
         generate_get_asset_params, generate_get_asset_proof_params,
         generate_get_assets_by_authority_params, generate_get_assets_by_creator_params,
         generate_get_assets_by_group_params, generate_get_assets_by_owner_params,
+        generate_get_signatures_for_asset, generate_get_token_accounts,
     },
     requests::Body,
 };
@@ -203,6 +206,35 @@ impl Worker {
                         Body::new(
                             GET_ASSET_BY_CREATOR_METHOD,
                             json!(generate_get_assets_by_creator_params(arg_key, None, None)),
+                        )
+                    } else if command == GET_TOKEN_ACCOUNTS_BY_OWNER {
+                        Body::new(
+                            GET_TOKEN_ACCOUNTS,
+                            json!(generate_get_token_accounts(Some(arg_key), None)),
+                        )
+                    } else if command == GET_TOKEN_ACCOUNTS_BY_MINT {
+                        Body::new(
+                            GET_TOKEN_ACCOUNTS,
+                            json!(generate_get_token_accounts(None, Some(arg_key))),
+                        )
+                    } else if command == GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT {
+                        let owner_mint: Vec<String> = arg_key
+                            .trim_matches(|c| c == '(' || c == ')')
+                            .split(';')
+                            .map(String::from)
+                            .collect();
+
+                        Body::new(
+                            GET_TOKEN_ACCOUNTS,
+                            json!(generate_get_token_accounts(
+                                Some(owner_mint[0].clone()),
+                                Some(owner_mint[1].clone())
+                            )),
+                        )
+                    } else if command == GET_SIGNATURES_FOR_ASSET {
+                        Body::new(
+                            GET_SIGNATURES_FOR_ASSET,
+                            json!(generate_get_signatures_for_asset(arg_key)),
                         )
                     } else {
                         panic!("Unknown command was passed")
