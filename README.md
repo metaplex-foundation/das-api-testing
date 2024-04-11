@@ -15,7 +15,7 @@ export RUST_LOG=info
 ```
 5. Initiate the testing process with the command below, ensuring the path to your configuration file is correctly specified.
 ```bash
-cargo run -- --config-path=/path/to/your/config.json ----test-type=integrity/performance
+cargo run -- --config-path=</path/to/your/config.json> --test-type=<integrity|performance>
 ```
 
 ## Configuration Setup
