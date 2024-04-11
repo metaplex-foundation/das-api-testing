@@ -190,64 +190,60 @@ impl Worker {
                 let (command, arg_key) = self.keys_fetcher.get_random_command();
 
                 let body = {
-                    if command == GET_ASSET_METHOD {
-                        Body::new(GET_ASSET_METHOD, json!(generate_get_asset_params(arg_key)))
-                    } else if command == GET_ASSET_PROOF_METHOD {
-                        Body::new(
+                    match command.as_ref() {
+                        GET_ASSET_METHOD => {
+                            Body::new(GET_ASSET_METHOD, json!(generate_get_asset_params(arg_key)))
+                        }
+                        GET_ASSET_PROOF_METHOD => Body::new(
                             GET_ASSET_PROOF_METHOD,
                             json!(generate_get_asset_proof_params(arg_key)),
-                        )
-                    } else if command == GET_ASSET_BY_OWNER_METHOD {
-                        Body::new(
+                        ),
+                        GET_ASSET_BY_OWNER_METHOD => Body::new(
                             GET_ASSET_BY_OWNER_METHOD,
                             json!(generate_get_assets_by_owner_params(arg_key, None, None)),
-                        )
-                    } else if command == GET_ASSET_BY_AUTHORITY_METHOD {
-                        Body::new(
+                        ),
+                        GET_ASSET_BY_AUTHORITY_METHOD => Body::new(
                             GET_ASSET_BY_AUTHORITY_METHOD,
                             json!(generate_get_assets_by_authority_params(arg_key, None, None)),
-                        )
-                    } else if command == GET_ASSET_BY_GROUP_METHOD {
-                        Body::new(
+                        ),
+                        GET_ASSET_BY_GROUP_METHOD => Body::new(
                             GET_ASSET_BY_GROUP_METHOD,
                             json!(generate_get_assets_by_group_params(arg_key, None, None)),
-                        )
-                    } else if command == GET_ASSET_BY_CREATOR_METHOD {
-                        Body::new(
+                        ),
+                        GET_ASSET_BY_CREATOR_METHOD => Body::new(
                             GET_ASSET_BY_CREATOR_METHOD,
                             json!(generate_get_assets_by_creator_params(arg_key, None, None)),
-                        )
-                    } else if command == GET_TOKEN_ACCOUNTS_BY_OWNER {
-                        Body::new(
+                        ),
+                        GET_TOKEN_ACCOUNTS_BY_OWNER => Body::new(
                             GET_TOKEN_ACCOUNTS,
                             json!(generate_get_token_accounts(Some(arg_key), None)),
-                        )
-                    } else if command == GET_TOKEN_ACCOUNTS_BY_MINT {
-                        Body::new(
+                        ),
+                        GET_TOKEN_ACCOUNTS_BY_MINT => Body::new(
                             GET_TOKEN_ACCOUNTS,
                             json!(generate_get_token_accounts(None, Some(arg_key))),
-                        )
-                    } else if command == GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT {
-                        let owner_mint: Vec<String> = arg_key
-                            .trim_matches(|c| c == '(' || c == ')')
-                            .split(';')
-                            .map(String::from)
-                            .collect();
+                        ),
+                        GET_TOKEN_ACCOUNTS_BY_OWNER_AND_MINT => {
+                            let owner_mint: Vec<String> = arg_key
+                                .trim_matches(|c| c == '(' || c == ')')
+                                .split(';')
+                                .map(String::from)
+                                .collect();
 
-                        Body::new(
-                            GET_TOKEN_ACCOUNTS,
-                            json!(generate_get_token_accounts(
-                                Some(owner_mint[0].clone()),
-                                Some(owner_mint[1].clone())
-                            )),
-                        )
-                    } else if command == GET_SIGNATURES_FOR_ASSET {
-                        Body::new(
+                            Body::new(
+                                GET_TOKEN_ACCOUNTS,
+                                json!(generate_get_token_accounts(
+                                    Some(owner_mint[0].clone()),
+                                    Some(owner_mint[1].clone())
+                                )),
+                            )
+                        }
+                        GET_SIGNATURES_FOR_ASSET => Body::new(
                             GET_SIGNATURES_FOR_ASSET,
                             json!(generate_get_signatures_for_asset(arg_key)),
-                        )
-                    } else {
-                        panic!("Unknown command was passed")
+                        ),
+                        _ => {
+                            panic!("Unknown command was passed")
+                        }
                     }
                 };
 
