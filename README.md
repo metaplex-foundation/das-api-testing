@@ -41,6 +41,7 @@ Within the `config/config_example.json` file located in this repository, you wil
 * The `test_duration_time` parameter specifies the duration, in seconds, for which the test will run. **For performance test only**
 
 For performance tests `testing_host` API will be used.
+Please bear in mind that each worker in the performance test will continuously send requests throughout the test duration. If there are any limits imposed by the provider you intend to test, we advise against setting a high value for the `num_of_virtual_users` parameter.
 
 ## Testing keys file
 
