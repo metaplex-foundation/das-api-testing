@@ -1,8 +1,7 @@
 ## DAS-API Testing Suite
 
 This repository is dedicated to the DAS-API Testing Suite, designed to facilitate the comparison of responses from two distinct providers, namely the reference and the testing entities.
-
-Also it has performance tests.
+It also includes the framework to run performance tests for the selected host.
 
 ## Utilization Guidelines
 
