@@ -1,8 +1,6 @@
 use crate::error::IntegrityVerificationError;
 use reqwest::Client;
 
-pub const SUCCESS_CODE: u16 = 200;
-
 #[derive(Debug)]
 pub struct IntegrityVerificationApi {
     client: Client,
@@ -30,7 +28,7 @@ impl IntegrityVerificationApi {
 
         let code = resp.status();
 
-        if code != SUCCESS_CODE {
+        if code != reqwest::StatusCode::OK {
             return Err(IntegrityVerificationError::ResponseStatusCode(
                 code.as_u16(),
             ));
