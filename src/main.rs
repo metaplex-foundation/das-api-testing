@@ -51,10 +51,6 @@ async fn main() -> Result<(), IntegrityVerificationError> {
 
     let config = setup_config(args.config_path.as_str())?;
 
-    let keys_fetcher = FileKeysFetcher::new(&config.testing_file_path.clone())
-        .await
-        .unwrap();
-
     match args.test_type {
         TestsType::Integrity => {
             let mut tasks = JoinSet::new();
@@ -78,8 +74,8 @@ async fn main() -> Result<(), IntegrityVerificationError> {
             run_performance_tests(
                 config.num_of_virtual_users,
                 config.test_duration_time,
-                keys_fetcher,
                 config.testing_host,
+                config.testing_file_path.clone(),
             )
             .await;
         }
