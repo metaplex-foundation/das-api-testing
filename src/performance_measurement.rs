@@ -253,10 +253,9 @@ impl Worker {
                     .make_request(&self.api_endpoint, &json!(body).to_string())
                     .await;
 
-                let mut stat = self.stat.lock().await;
-                stat.add_response_time(start.elapsed().as_millis() as u64);
-
                 if let Err(e) = api_call_result {
+                    let mut stat = self.stat.lock().await;
+
                     if let IntegrityVerificationError::ResponseStatusCode(code) = e {
                         stat.inc_failed_requests();
                         stat.inc_error_code(code);
@@ -264,6 +263,8 @@ impl Worker {
                         stat.inc_failed_requests();
                     }
                 } else {
+                    let mut stat = self.stat.lock().await;
+                    stat.add_response_time(start.elapsed().as_millis() as u64);
                     stat.inc_successful_requests();
                 }
             }
@@ -274,8 +275,8 @@ impl Worker {
 pub async fn run_performance_tests(
     num_of_threads: usize,
     test_duration: u64,
-    keys_fetcher: FileKeysFetcher,
     api_url: String,
+    testing_file_path: String,
 ) {
     let (tx, rx) = watch::channel(Commands::Init);
 
@@ -283,7 +284,9 @@ pub async fn run_performance_tests(
 
     let mut set = JoinSet::new();
     for id in 0..num_of_threads {
-        let keys_fetcher = keys_fetcher.clone();
+        let keys_fetcher = FileKeysFetcher::new(&testing_file_path.clone())
+            .await
+            .unwrap();
         let rx = rx.clone();
         let stat = stat.clone();
         let api_url = api_url.clone();
